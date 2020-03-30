@@ -2,8 +2,8 @@
 @Author: TangZhiFeng
 @Data: Do not edit
 @LastEditors: TangZhiFeng
-@LastEditTime: 2020-03-30 09:49:10
-@Description: 
+@LastEditTime: 2020-03-30 10:53:38
+@Description: 训练代码
 '''
 # coding: UTF-8
 import time
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # 这个X等同于创建了一个py的实例
     x = import_module('models.' + model_name)
     # 直接调用了py文件中的Config
-    config = x.Config(dataset, embedding)
+    config = x.Test_Config(dataset, embedding)
     np.random.seed(1)
     torch.manual_seed(1)
     torch.cuda.manual_seed_all(1)
@@ -55,6 +55,6 @@ if __name__ == '__main__':
     config.n_vocab = len(vocab)
     model = x.Model(config).to(config.device)
     if model_name != 'Transformer':
-    init_network(model)
+        init_network(model)
     print(model.parameters)
     train(config, model, train_iter, dev_iter, test_iter)
