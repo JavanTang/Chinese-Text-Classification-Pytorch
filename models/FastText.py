@@ -2,7 +2,7 @@
 @Author: TangZhiFeng
 @Data: Do not edit
 @LastEditors: TangZhiFeng
-@LastEditTime: 2020-03-30 11:23:55
+@LastEditTime: 2020-03-30 11:48:32
 @Description: 
 '''
 # coding: UTF-8
@@ -54,7 +54,7 @@ class GenerateConfig(Config):
         self.vocab_path = 'THUCNews/data/vocab.pkl'
         self.save_path = 'THUCNews/saved_dict/FastText.ckpt'
         self.embedding_pretrained = None
-
+        self.embed = 300
 
 
 
