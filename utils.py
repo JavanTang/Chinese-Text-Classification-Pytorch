@@ -28,6 +28,45 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
     return vocab_dic
 
 
+def sentance2ids(content: str, config, ues_word=False, pad_size=32):
+    """从句子到向量
+    
+    Arguments:
+        content {str} -- 文本内容
+        config {配置}} -- 配置文件
+    
+    Keyword Arguments:
+        ues_word {bool} -- 使用什么来配置 (default: {False})
+        pad_size {int} -- 每个词填充的大小 (default: {32})
+    
+    Returns:
+        list -- 向量
+    """
+    words_line = []
+    if ues_word:
+        tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
+    else:
+        tokenizer = lambda x: [y for y in x]  # char-level
+    if os.path.exists(config.vocab_path):
+        vocab = pkl.load(open(config.vocab_path, 'rb'))
+    else:
+        vocab = build_vocab(config.train_path, tokenizer=tokenizer, max_size=MAX_VOCAB_SIZE, min_freq=1)
+        pkl.dump(vocab, open(config.vocab_path, 'wb'))
+    token = tokenizer(content)  
+    seq_len = len(token)
+    if pad_size:
+        if len(token) < pad_size:
+            token.extend([PAD] * (pad_size - len(token)))
+        else:
+            token = token[:pad_size]
+            seq_len = pad_size
+    # word to id
+    for word in token:
+        words_line.append(vocab.get(word, vocab.get(UNK)))
+    return words_line
+
+    
+
 def build_dataset(config, ues_word):
     if ues_word:
         tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
@@ -72,6 +111,7 @@ class DatasetIterater(object):
     def __init__(self, batches, batch_size, device):
         self.batch_size = batch_size
         self.batches = batches
+        # //也是除法但是会变成整数
         self.n_batches = len(batches) // batch_size
         self.residue = False  # 记录batch数量是否为整数
         if len(batches) % self.n_batches != 0:
@@ -96,6 +136,7 @@ class DatasetIterater(object):
 
         elif self.index >= self.n_batches:
             self.index = 0
+            # 这里抛出这个Exception就是终止
             raise StopIteration
         else:
             batches = self.batches[self.index * self.batch_size: (self.index + 1) * self.batch_size]

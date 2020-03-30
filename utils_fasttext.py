@@ -13,6 +13,17 @@ UNK, PAD = '<UNK>', '<PAD>'
 
 
 def build_vocab(file_path, tokenizer, max_size, min_freq):
+    """构建词袋
+    
+    Arguments:
+        file_path {str}} -- 文本的路径
+        tokenizer {func} -- 构建词的方法,两种方法:分词,分字符
+        max_size {int} -- 一个词最大的数组表示长度
+        min_freq {int} -- 最小的词长度
+    
+    Returns:
+        dict -- 词袋的对应关系,例如 {"士兵":[1,0,0,0,1,...,1]}
+    """
     vocab_dic = {}
     with open(file_path, 'r', encoding='UTF-8') as f:
         for line in tqdm(f):
@@ -29,22 +40,45 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
 
 
 def build_dataset(config, ues_word):
+    # 查看是使用分词的词,还是使用字符
     if ues_word:
         tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
     else:
         tokenizer = lambda x: [y for y in x]  # char-level
+    # 判断是不是有了词表
     if os.path.exists(config.vocab_path):
         vocab = pkl.load(open(config.vocab_path, 'rb'))
     else:
+        # 如果没有词表就把用训练数据重新训练
         vocab = build_vocab(config.train_path, tokenizer=tokenizer, max_size=MAX_VOCAB_SIZE, min_freq=1)
         pkl.dump(vocab, open(config.vocab_path, 'wb'))
     print(f"Vocab size: {len(vocab)}")
 
     def biGramHash(sequence, t, buckets):
+        """生成两个字符在一起的hash值<===它的标题是这个意思,但是我感觉这个仅仅只是做了一个字符的hash值
+        
+        Arguments:
+            sequence {list}} -- 字符转化成为了id之后的list
+            t {int} -- 位置信息,就是对第几个位置做
+            buckets {int} -- 长度
+        
+        Returns:
+            int -- 生成的hash值
+        """
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         return (t1 * 14918087) % buckets
 
     def triGramHash(sequence, t, buckets):
+        """生成三个字符在一起的hash值<===它的标题是这个意思,但是我感觉这个仅仅只是做了两个字符的hash值
+        
+        Arguments:
+            sequence {list}} -- 字符转化成为了id之后的list
+            t {int} -- 位置信息,就是对第几个位置做
+            buckets {int} -- 长度
+        
+        Returns:
+            int -- 生成的hash值
+        """
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         t2 = sequence[t - 2] if t - 2 >= 0 else 0
         return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
@@ -52,7 +86,7 @@ def build_dataset(config, ues_word):
     def load_dataset(path, pad_size=32):
         contents = []
         with open(path, 'r', encoding='UTF-8') as f:
-            for line in tqdm(f):
+            for line in tqdm(f):    # tqdm将f转化成为list
                 lin = line.strip()
                 if not lin:
                     continue
@@ -62,8 +96,10 @@ def build_dataset(config, ues_word):
                 seq_len = len(token)
                 if pad_size:
                     if len(token) < pad_size:
+                        # extend等同于+, 同时这里是给token填充PAD字符
                         token.extend([PAD] * (pad_size - len(token)))
                     else:
+                        # 如果大于pad_size就直接截断
                         token = token[:pad_size]
                         seq_len = pad_size
                 # word to id
@@ -76,6 +112,7 @@ def build_dataset(config, ues_word):
                 trigram = []
                 # ------ngram------
                 for i in range(pad_size):
+                    # 这个有什么意义?   貌似只有biGramHash只是求得了一个的hash值,triGramHash求得了两个的哈希值
                     bigram.append(biGramHash(words_line, i, buckets))
                     trigram.append(triGramHash(words_line, i, buckets))
                 # -----------------

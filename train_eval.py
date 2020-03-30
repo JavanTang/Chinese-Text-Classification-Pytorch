@@ -28,6 +28,9 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
 
 def train(config, model, train_iter, dev_iter, test_iter):
     start_time = time.time()
+    # 使用PyTorch进行训练和测试时一定注意要把实例化的model指定train/eval，eval（）时，
+    # 框架会自动把BN和DropOut固定住，不会取平均，而是用训练好的值，不然的话，一旦test的
+    # batch_size过小，很容易就会被BN层导致生成图片颜色失真极大！！！！！！
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
