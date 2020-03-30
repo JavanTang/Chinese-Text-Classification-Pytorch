@@ -2,7 +2,7 @@
 @Author: TangZhiFeng
 @Data: Do not edit
 @LastEditors: TangZhiFeng
-@LastEditTime: 2020-03-30 10:27:28
+@LastEditTime: 2020-03-30 11:23:55
 @Description: 
 '''
 # coding: UTF-8
@@ -31,6 +31,7 @@ class Config(object):
 class Test_Config(Config):
 
     def __init__(self, dataset, embedding):
+        super(Test_Config, self).__init__() 
         self.train_path = dataset + '/data/train.txt'                                # 训练集
         self.dev_path = dataset + '/data/dev.txt'                                    # 验证集
         self.test_path = dataset + '/data/test.txt'                                  # 测试集
@@ -45,7 +46,7 @@ class Test_Config(Config):
             if embedding != 'random' else None                                       # 预训练词向量
         self.embed = self.embedding_pretrained.size(1)\
             if self.embedding_pretrained is not None else 300           # 字向量维度
-        super(Test_Config, self).__init__() 
+        
 
 class GenerateConfig(Config):
     def __init__(self):
