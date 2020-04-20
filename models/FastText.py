@@ -17,7 +17,8 @@ class Config(object):
     """配置参数"""
     def __init__(self):
         self.model_name = 'FastText'
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
+        # self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
+        self.device = torch.device('cpu')
         self.dropout = 0.5                                              # 随机失活
         self.require_improvement = 1000                                 # 若超过1000batch效果还没提升，则提前结束训练self.num_classes = len(self.class_list)                         # 类别数
         self.n_vocab = 0                                                # 词表大小，在运行时赋值
@@ -53,8 +54,11 @@ class GenerateConfig(Config):
         super(GenerateConfig, self).__init__() 
         self.vocab_path = 'THUCNews/data/vocab.pkl'
         self.save_path = 'THUCNews/saved_dict/FastText.ckpt'
+        self.train_path = 'THUCNews/data/train.txt'                                # 训练集
         self.embedding_pretrained = None
         self.embed = 300
+        self.class_list = [x.strip() for x in open('THUCNews/data/class.txt', encoding='utf-8').readlines()]  
+        self.num_classes = len(self.class_list)                         # 类别数
 
 
 
