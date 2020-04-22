@@ -5,7 +5,7 @@ import torch
 import unittest   # The test framework
 from models import FastText
 from utils_fasttext import sentance2ids, build_iterator
-config = FastText.GenerateConfig()
+config = FastText.YnynConfig()
 MAX_VOCAB_SIZE = 10000  # 词表长度限制
 
 

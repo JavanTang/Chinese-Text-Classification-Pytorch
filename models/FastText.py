@@ -61,7 +61,16 @@ class GenerateConfig(Config):
         self.num_classes = len(self.class_list)                         # 类别数
 
 
-
+class YnynConfig(Config):
+    def __init__(self):
+        super(YnynConfig, self).__init__() 
+        self.vocab_path = 'ynyn/data/vocab.pkl'
+        self.save_path = 'ynyn/saved_dict/FastText.ckpt'
+        self.train_path = 'ynyn/data/train.txt'                                # 训练集
+        self.embedding_pretrained = None
+        self.embed = 300
+        self.class_list = [x.strip() for x in open('ynyn/data/class.txt', encoding='utf-8').readlines()]  
+        self.num_classes = len(self.class_list)              
 
 '''Bag of Tricks for Efficient Text Classification'''
 
