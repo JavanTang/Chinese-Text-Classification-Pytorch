@@ -48,6 +48,24 @@ class Test_Config(Config):
         self.embed = self.embedding_pretrained.size(1)\
             if self.embedding_pretrained is not None else 300           # 字向量维度
         
+class YnynTestConfig(Config):
+
+    def __init__(self, dataset, embedding):
+        super(Test_Config, self).__init__() 
+        self.train_path = dataset + '/data/train.txt'                                # 训练集
+        self.dev_path = dataset + '/data/dev.txt'                                    # 验证集
+        self.test_path = dataset + '/data/test.txt'                                  # 测试集
+        self.class_list = [x.strip() for x in open(
+            dataset + '/data/class.txt', encoding='utf-8').readlines()]              # 类别名单
+        self.num_classes = len(self.class_list)                         # 类别数
+        self.vocab_path = dataset + '/data/vocab.pkl'                                # 词表
+        self.save_path = dataset + '/saved_dict/' + self.model_name + '.ckpt'        # 模型训练结果
+        self.log_path = dataset + '/log/' + self.model_name
+        self.embedding_pretrained = torch.tensor(
+            np.load(dataset + '/data/' + embedding)["embeddings"].astype('float32'))\
+            if embedding != 'random' else None                                       # 预训练词向量
+        self.embed = self.embedding_pretrained.size(1)\
+            if self.embedding_pretrained is not None else 300           # 字向量维度
 
 class GenerateConfig(Config):
     def __init__(self):
